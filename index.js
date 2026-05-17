@@ -16,6 +16,13 @@ app.use(login);
 app.use(offer);
 app.use(cors());
 
+app.get("/", (req, res) => {
+  try {
+    return res.status(404).json({ message: "Bienvenue !" });
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+});
 // Catch routes not found
 app.all(/.*/, (req, res) => {
   return res.status(404).json({ message: "Not Found" });
