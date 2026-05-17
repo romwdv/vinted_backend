@@ -20,6 +20,6 @@ app.use(cors());
 app.all(/.*/, (req, res) => {
   return res.status(404).json({ message: "Not Found" });
 });
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("Serveur Vinted On 👚");
 });
