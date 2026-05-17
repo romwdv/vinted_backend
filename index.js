@@ -18,7 +18,7 @@ app.use(cors());
 
 app.get("/", (req, res) => {
   try {
-    return res.status(404).json({ message: "Bienvenue !" });
+    return res.status(200).json({ message: "Bienvenue !" });
   } catch (error) {
     res.status(500).json(error.message);
   }
