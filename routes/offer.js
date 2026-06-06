@@ -140,7 +140,7 @@ router.get("/offers", async (req, res) => {
     const count = await Offer.countDocuments(queryfilter);
     const results = await Offer.find(queryfilter)
       .select(
-        "product_name product_description product_image product_price city owner -_id",
+        "product_name product_description product_image product_price city owner _id",
       )
       .populate("owner", "account.username -_id")
       .sort(querySort)
