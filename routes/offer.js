@@ -137,7 +137,6 @@ router.get("/offers", async (req, res) => {
       limit = 5;
       skip = limit * (page - 1);
     }
-    // console.log(querySort); // { product_price: 'asc' }
     const count = await Offer.countDocuments(queryfilter);
     const results = await Offer.find(queryfilter)
       .select(
