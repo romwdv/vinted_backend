@@ -11,10 +11,10 @@ const login = require("./routes/login");
 const offer = require("./routes/offer");
 
 app.use(express.json());
+app.use(cors(["https://vintok.romwdv.fr", "http://localhost:5173"]));
 app.use(signup);
 app.use(login);
 app.use(offer);
-app.use(cors());
 
 app.get("/", (req, res) => {
   try {
