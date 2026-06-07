@@ -30,50 +30,50 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      const { title, description, price, condition, city, brand, size, color } =
-        req.body;
-      //   console.log(req.user.id); // 6a032fc27fbef18f4b9e8320
-      // console.log(userFound.id); // 6a032f957fbef18f4b9e831f
-      // console.log(title); // "Pantalon"
-      // console.log(req.files); // picture object
-      const imgConverted = convertToBase64(req.files.picture);
-      // console.log(imgConverted); // picture base64
-      const newOffer = await new Offer({
+      const {
+        title,
+        description,
+        price,
+        condition,
+        city,
+        brand,
+        size,
+        color,
+        picture,
+      } = req.body;
+      console.log(req.files);
+
+      // 2. Générer un id manuellement
+      const offerId = new mongoose.Types.ObjectId();
+
+      // 3. Upload Cloudinary en premier
+      const uploadPromises = req.files.picture.map((file) => {
+        const imgConverted = convertToBase64(file);
+        return cloudinary.uploader.upload(imgConverted, {
+          folder: `/vinted/offers/${offerId}`,
+        });
+      });
+      const uploadResults = await Promise.all(uploadPromises);
+      // 4. Créer l'offre avec l'image déjà uploadée
+      const newOffer = new Offer({
+        _id: offerId,
         product_name: title,
         product_description: description,
         product_price: Number(price),
         product_details: [
-          {
-            MARQUE: brand,
-          },
-          {
-            TAILLE: size,
-          },
-          {
-            ETAT: condition,
-          },
-          {
-            COULEUR: color,
-          },
-          {
-            CITY: city,
-          },
+          { MARQUE: brand },
+          { TAILLE: size },
+          { ETAT: condition },
+          { COULEUR: color },
+          { CITY: city },
         ],
-        // product_image: uploadResult,
+        product_image: uploadResults,
         owner: req.user.id,
       });
-      await newOffer.save();
-      const idOffer = newOffer._id.toString();
-      const uploadResult = await cloudinary.uploader.upload(imgConverted, {
-        folder: `/vinted/offers/${idOffer}`,
-      });
-      // opti possible en
-      const newOfferWithImg = await Offer.findByIdAndUpdate(idOffer, {
-        product_image: uploadResult,
-      });
 
-      // console.log(uploadResult); // Cloudinary result
-      res.status(200).json(newOfferWithImg);
+      await newOffer.save();
+
+      res.status(200).json(newOffer);
     } catch (error) {
       res.status(500).json(error.message);
     }
@@ -140,7 +140,7 @@ router.get("/offers", async (req, res) => {
     const count = await Offer.countDocuments(queryfilter);
     const results = await Offer.find(queryfilter)
       .select(
-        "product_name product_description product_image product_price city owner _id",
+        "product_name product_details product_description product_image product_price city owner _id",
       )
       .populate("owner", "account.username -_id")
       .sort(querySort)
