@@ -134,9 +134,9 @@ router.get("/offers", async (req, res) => {
       limit = 5;
       skip = limit * (page - 1);
     }
-    const counter = 0;
-    console.log("query reçue :", req.query, counter++);
-    console.log("querySort :", querySort);
+    // const counter = 0;
+    // console.log("query reçue :", req.query, counter++);
+    // console.log("querySort :", querySort);
     const count = await Offer.countDocuments(queryfilter);
     const results = await Offer.find(queryfilter)
       .select(
