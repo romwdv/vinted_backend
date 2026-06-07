@@ -142,7 +142,7 @@ router.get("/offers", async (req, res) => {
       .select(
         "product_name product_details product_description product_image product_price city owner _id",
       )
-      .populate("owner", "account.username -_id")
+      .populate("owner", "account -_id")
       .sort(querySort)
       .limit(limit)
       .skip(skip);
@@ -156,7 +156,8 @@ router.get("/offers", async (req, res) => {
 router.get("/offer/:id", async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id).populate("owner");
-    res.status(200).json(offer);
+    console.log("owner brut =>", offer.owner.account);
+    res.status(200).json(JSON.parse(JSON.stringify(offer)));
   } catch (error) {
     res.status(500).json(error.message);
   }
