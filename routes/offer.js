@@ -125,18 +125,18 @@ router.get("/offers", async (req, res) => {
       }
     }
 
-    if (sort) {
-      if (sort === "price-desc") {
-        querySort.product_price = "desc";
-      }
+    if (sort === "product-desc") {
+      querySort.product_price = -1;
     } else {
-      querySort.product_price = "asc";
+      querySort.product_price = 1;
     }
-
     if (page) {
       limit = 5;
       skip = limit * (page - 1);
     }
+
+    console.log("query reçue :", req.query);
+    console.log("querySort :", querySort);
     const count = await Offer.countDocuments(queryfilter);
     const results = await Offer.find(queryfilter)
       .select(
