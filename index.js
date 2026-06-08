@@ -11,7 +11,7 @@ const login = require("./routes/login");
 const offer = require("./routes/offer");
 
 app.use(express.json());
-app.use(cors(["https://vintok.romwdv.fr", "http://localhost:5173"]));
+app.use(cors(["https://vintok.romwdv.fr", "http://localhost:5174"]));
 app.use(signup);
 app.use(login);
 app.use(offer);

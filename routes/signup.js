@@ -15,7 +15,6 @@ const convertToBase64 = require("../function/convertBase64");
 // 1 - Route Signup
 
 router.post("/user/signup", fileUpload(), async (req, res) => {
-  console.log(req.files.avatar);
   try {
     const { username, email, password } = req.body;
     // console.log(username); // return true
@@ -29,9 +28,13 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
         const salt = uid2(16);
         const saltedPwd = password + salt;
         const hash = encBase64.stringify(sha256(saltedPwd));
-        const avatar = convertToBase64(req.files.avatar);
 
-        const newUser = new User({
+        let avatar;
+        if (req.files && req.files.avatar) {
+          avatar = convertToBase64(req.files.avatar);
+        }
+
+        const newUserData = {
           email,
           account: {
             username,
@@ -39,22 +42,31 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
           token,
           hash,
           salt,
-        });
+        };
+
+        if (avatar) {
+          newUserData.account.avatar = avatar;
+        }
+
+        const newUser = new User(newUserData);
         await newUser.save();
-        const idUser = newUser._id.toString();
-        const avatarUpload = await cloudinary.uploader.upload(avatar, {
-          folder: `/vinted/avatar/${idUser}`,
-        });
-        const userAvatarUpdate = await User.findByIdAndUpdate(
-          idUser,
-          {
-            $set: {
-              "account.avatar": avatarUpload,
+
+        if (avatar) {
+          const avatarUpload = await cloudinary.uploader.upload(avatar, {
+            folder: `/vinted/avatar/${newUser._id}`,
+          });
+          await User.findByIdAndUpdate(
+            newUser._id,
+            {
+              $set: {
+                "account.avatar": avatarUpload,
+              },
             },
-          },
-          { returnDocument: "after" },
-        );
-        res.status(201).json(userAvatarUpdate);
+            { returnDocument: "after" },
+          );
+        }
+
+        res.status(201).json(newUser);
       } else {
         res.status(400).json("Informations invalides");
       }

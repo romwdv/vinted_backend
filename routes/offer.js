@@ -30,24 +30,25 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      const {
-        title,
-        description,
-        price,
-        condition,
-        city,
-        brand,
-        size,
-        color,
-        picture,
-      } = req.body;
-      console.log(req.files);
+      const { title, description, price, condition, city, brand, size, color } =
+        req.body;
+
+      const { picture } = req.files;
+
+      console.log("req.body:", req.body);
+      console.log("req.files:", req.files);
+      console.log("prix:", price);
 
       // 2. Générer un id manuellement
       const offerId = new mongoose.Types.ObjectId();
 
       // 3. Upload Cloudinary en premier
-      const uploadPromises = req.files.picture.map((file) => {
+      // Gérer une ou plusieurs images
+      const pictureArray = Array.isArray(req.files.picture)
+        ? req.files.picture
+        : [req.files.picture];
+
+      const uploadPromises = pictureArray.map((file) => {
         const imgConverted = convertToBase64(file);
         return cloudinary.uploader.upload(imgConverted, {
           folder: `/vinted/offers/${offerId}`,
@@ -73,8 +74,10 @@ router.post(
 
       await newOffer.save();
 
+      console.log(newOffer);
       res.status(200).json(newOffer);
     } catch (error) {
+      console.log(error.message);
       res.status(500).json(error.message);
     }
   },
