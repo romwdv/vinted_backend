@@ -9,14 +9,23 @@ mongoose.connect(process.env.MONGODB_URI);
 const signup = require("./routes/signup");
 const login = require("./routes/login");
 const offer = require("./routes/offer");
+const paiement = require("./routes/paiement");
 
 app.use(express.json());
-app.use(cors(["https://vintok.romwdv.fr", "http://localhost:5174"]));
+app.use(
+  cors([
+    "https://vintok.romwdv.fr",
+    "http://localhost:5174",
+    "http://localhost:5173",
+  ]),
+);
 app.use(signup);
 app.use(login);
 app.use(offer);
+app.use(paiement);
 
 app.get("/", (req, res) => {
+  console.log(req.body);
   try {
     return res.status(200).json({ message: "Bienvenue !" });
   } catch (error) {

@@ -74,7 +74,6 @@ router.post(
 
       await newOffer.save();
 
-      console.log(newOffer);
       res.status(200).json(newOffer);
     } catch (error) {
       console.log(error.message);
@@ -159,7 +158,6 @@ router.get("/offers", async (req, res) => {
 router.get("/offer/:id", async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id).populate("owner");
-    console.log("owner brut =>", offer.owner.account);
     res.status(200).json(JSON.parse(JSON.stringify(offer)));
   } catch (error) {
     res.status(500).json(error.message);
